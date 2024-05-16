@@ -15,7 +15,17 @@ public class SudokoLogic {
         }
     }
 
-    public  boolean countGreterThanTwoCheck(int[] rowDistinctCount){
+    public int[] countToatalAnswers(){
+        int[] coutTot= new int[10];
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid.length; j++) {
+                coutTot[grid[i][j]]++;
+            }
+        }
+        return coutTot;
+    }
+
+    public  boolean countIsDistinctCheck(int[] rowDistinctCount){
         boolean distinct= true;
 
         for (int i = 1; i < rowDistinctCount.length; i++) {
@@ -23,36 +33,54 @@ public class SudokoLogic {
         }
         return distinct;
     }
+
+
+    //change to be location place (col+1%3  go stepps up  || row+1%3 go stepps up )
     public  boolean InsertSolutionAndCheckIfValid(int x, int y, int num){
         grid[x][y]=num;
         boolean distinct =true;
         System.out.println("ruuning check");
-        for (int i = 0; i < this.grid.length; i++) {
+        for (int row = 0; row < this.grid.length; row++) {
             int[] rowDistinctCount=new int[10];
             int[] ColumnDistinctCount=new int[10];
-            for (int j = 0; j < this.grid.length; j++) {
-                rowDistinctCount[this.grid[i][j]]++;
-                ColumnDistinctCount[this.grid[j][i]]++;
+            for (int col = 0; col < this.grid.length; col++) {
+                rowDistinctCount[this.grid[row][col]]++;
+                ColumnDistinctCount[this.grid[col][row]]++;
             }
-            if(countGreterThanTwoCheck(rowDistinctCount)){distinct=false; i=10; }
-            if(countGreterThanTwoCheck(ColumnDistinctCount)){distinct=false; i=10; } ////////////  check if allowed
+            if(!countIsDistinctCheck(rowDistinctCount)){distinct=false; row=10; }
+            if(!countIsDistinctCheck(ColumnDistinctCount)){distinct=false; row=10; }
         }
-
-        int i,j,limRow=3,limCol=3, maxLimRow=grid.length,maxLimCol=grid.length;
-        for (i=0; i < limRow; i++) {
-            int[] boxDistinctCount=new int[10];
-            for (j = 0; j < limCol; j++) {
-                boxDistinctCount[grid[i][j]]++;
-            }
-            if((i+1)%3==0) {
-                if (countGreterThanTwoCheck(boxDistinctCount)) {distinct = false; i = maxLimRow; }
-                else if(i+3 < maxLimRow) {limRow+=3;limCol+=3;}
+        // 00 , 03 , 06 , 30 , 33 , 36 , 60 ,63 , 66
+        if(distinct) {
+            for (int i = 0; i < this.grid.length; i += 3) {
+                for (int j = 0; j < this.grid.length; j += 3) {
+                    distinct = checkBoxHasDistinctNums(i, j);
+                    System.out.println("check box distinct? " + distinct + " i: " + i + " j: " + j);
+                    if (!distinct) {
+                        j = 10;
+                        i = 10;
+                        break;
+                    }
+                }
             }
         }
-        // 0-2, 0-2  ||  3-5, 0-2 || 6-8, 0-2
-        // 0-2, 3-5  ||  3-5, 3-5 || 6-8, 3-5
-        // 0-2, 6-8  ||  3-5, 6-8 || 6-8, 6-8
-
         return distinct;
     }
+    public  boolean checkBoxHasDistinctNums(int row, int col){
+        boolean distinct =true;
+        int[] boxDistinctCount=new int[10];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                boxDistinctCount[grid[row+i][col+j]]++;
+                System.out.println(grid[row+i][col+j]);
+            }
+        }
+        if(!countIsDistinctCheck(boxDistinctCount)){distinct=false;}
+        return distinct;
+    }
+
+
+
+
+
 }
